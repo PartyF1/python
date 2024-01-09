@@ -84,7 +84,7 @@ def start_algorithm():
         merge_sort(data, drawData, 0, len(data), speedbar.get())
     if (algmenu.get() == 'Quick Sort'):
         quick_sort(data, 0, len(data) - 1, drawData, speedbar.get())
-        drawData(data, ['Green' for x in range(len(data))])
+    drawData(data, ['Green' for x in range(len(data))])
 
 
 # creating main user interface frame and
