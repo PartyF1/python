@@ -1,5 +1,5 @@
 import math
-from tkinter import *
+from tkinter import messagebox
 import tkinter as tk
 
 
@@ -24,6 +24,26 @@ class CircularLinkedList:
                 temp = temp.next
             temp.next = new_node
             new_node.next = self.head
+
+    def remove(self, key):
+        if self.head.data == key:
+            current = self.head
+            while current.next != self.head:
+                current = current.next
+            if self.head == self.head.next:
+                self.head = None
+            else:
+                self.head = self.head.next
+                current.next = self.head
+        else:
+            current = self.head
+            prev = None
+            while current.next != self.head:
+                prev = current
+                current = current.next
+                if current.data == key:
+                    prev.next = current.next
+                    current = current.next
 
     def display(self):
         elements = []
@@ -50,8 +70,17 @@ class CircularListVisualization(tk.Tk):
         self.input_entry = tk.Entry(self.master)
         self.input_entry.pack()
 
-        self.enqueue_button = tk.Button(self.master, text="Enqueue", command=self.input)
-        self.enqueue_button.pack()
+        self.append_button = tk.Button(self.master, text="Append", command=self.input)
+        self.append_button.pack()
+
+        self.delete_label = tk.Label(self.master, text="Enter a value:")
+        self.delete_label.pack()
+
+        self.delete_entry = tk.Entry(self.master)
+        self.delete_entry.pack()
+
+        self.delete_button = tk.Button(self.master, text="Remove", command=self.delete)
+        self.delete_button.pack()
 
         self.canvas = tk.Canvas(self, width=300, height=300)
         self.canvas.pack()
@@ -63,6 +92,15 @@ class CircularListVisualization(tk.Tk):
         value = self.input_entry.get()
         if value:
             self.circular_linked_list.append(value)
+            self.display_list()
+
+    def delete(self):
+        value = self.delete_entry.get()
+        if(value):
+            try:
+                self.circular_linked_list.remove(value)
+            except Exception as ass:
+                messagebox.showwarning(str(ass))
             self.display_list()
 
     def display_list(self):
