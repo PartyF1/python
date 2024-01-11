@@ -2,15 +2,15 @@
 from tkinter import *
 from tkinter import ttk
 import random
-from Sort.bubbleSort import bubble
+from bubbleSort import bubble
 from quickSort import quick_sort
 from selectionSort import selectionSort
-from Sort.insertionSort import insertion_sort
+from insertionSort import insertion_sort
 from mergeSort import  merge_sort
 
 # initialising root class for Tkinter
 root = Tk()
-root.title("Bubble Sort Visualizer")
+root.title("Sort Visualizer")
 
 # maximum window size
 root.maxsize(900, 600)
