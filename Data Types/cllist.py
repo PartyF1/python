@@ -1,6 +1,10 @@
 import math
+import time
 from tkinter import messagebox
+from tkinter import *
 import tkinter as tk
+
+import timer
 
 
 class Node:
@@ -12,19 +16,45 @@ class Node:
 class CircularLinkedList:
     def __init__(self):
         self.head = None
+        self.selected = None
 
     def append(self, data):
         new_node = Node(data)
         if not self.head:
             self.head = new_node
             new_node.next = self.head
+            self.selected = new_node
+            return 0
         else:
             temp = self.head
             while temp.next != self.head:
                 temp = temp.next
             temp.next = new_node
             new_node.next = self.head
+            self.selected = new_node
+            return self.find(self.selected)
 
+    def remove(self):
+        if self.head == self.selected:
+            current = self.head
+            while current.next != self.selected:
+                current = current.next
+            if self.head == self.head.next:
+                self.head = None
+                self.selected = None
+            else:
+                self.head = self.head.next
+                current.next = self.head
+                self.selected = current
+        else:
+            current = self.head
+            while current.next != self.selected:
+                current = current.next
+            current.next = self.selected.next
+            self.selected = current
+        return self.find(self.selected)
+
+    """
     def remove(self, key):
         if self.head.data == key:
             current = self.head
@@ -37,13 +67,32 @@ class CircularLinkedList:
                 current.next = self.head
         else:
             current = self.head
-            prev = None
             while current.next != self.head:
                 prev = current
                 current = current.next
                 if current.data == key:
                     prev.next = current.next
                     current = current.next
+    """
+
+    def selectNext(self):
+        self.selected = self.selected.next
+        return self.find(self.selected)
+
+    def find(self, element):
+        if self.head is None:
+            return None
+        num = 0
+        current = self.head
+        while True:
+            if current == element:
+                return num
+            else:
+                current = current.next
+                num += 1
+            if current == self.head:
+                break
+        return num
 
     def display(self):
         elements = []
@@ -73,11 +122,11 @@ class CircularListVisualization(tk.Tk):
         self.append_button = tk.Button(self.master, text="Append", command=self.input)
         self.append_button.pack()
 
-        self.delete_label = tk.Label(self.master, text="Enter a value:")
+        self.delete_label = tk.Label(self.master, text="Selector")
         self.delete_label.pack()
 
-        self.delete_entry = tk.Entry(self.master)
-        self.delete_entry.pack()
+        self.select_button = tk.Button(self.master, text="Next", command=self.next)
+        self.select_button.pack()
 
         self.delete_button = tk.Button(self.master, text="Remove", command=self.delete)
         self.delete_button.pack()
@@ -91,22 +140,29 @@ class CircularListVisualization(tk.Tk):
     def input(self):
         value = self.input_entry.get()
         if value:
-            self.circular_linked_list.append(value)
-            self.display_list()
+            num = self.circular_linked_list.append(value)
+            self.display_list(num)
+
+    def next(self):
+        current = self.circular_linked_list.selected
+        if current is not None:
+            self.display_list(self.circular_linked_list.selectNext())
 
     def delete(self):
-        value = self.delete_entry.get()
-        if(value):
-            try:
-                self.circular_linked_list.remove(value)
-            except Exception as ass:
-                messagebox.showwarning(str(ass))
-            self.display_list()
+        # value = self.delete_entry.get()
+        # if value:
+        try:
+            next = self.circular_linked_list.remove()
+            self.display_list(next)
+        except Exception as ass:
+            messagebox.showwarning(str(ass))
 
-    def display_list(self):
+    def display_list(self, selected=None):
         self.canvas.delete("all")
         elements = []
         temp = self.circular_linked_list.head
+        if selected is None:
+            selected = 0
         while True:
             if temp:
                 elements.append(temp.data)
@@ -124,7 +180,14 @@ class CircularListVisualization(tk.Tk):
             for i, data in enumerate(elements):
                 x = 150 + radius * math.sin(math.radians(angle * i))
                 y = 150 + radius * math.cos(math.radians(angle * i))
-                self.canvas.create_oval(x - 10, y - 10, x + 10, y + 10, fill="cyan")
+                if selected == i:
+                    self.canvas.create_oval(x - 10, y - 10, x + 10, y + 10, fill="red")
+                    self.canvas.create_text(self.canvas.winfo_x(), 15, text="data: " + (str(data)))
+                else:
+                    self.canvas.create_oval(x - 10, y - 10, x + 10, y + 10, fill="lightgreen")
+                    self.canvas.update()
+                    self.canvas.after(200)
+                    self.canvas.create_oval(x - 10, y - 10, x + 10, y + 10, fill="cyan")
                 self.canvas.create_text(x, y, text=str(data))
                 if (i == 0):
                     x1, xi = x, x
